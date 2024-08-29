@@ -1,2 +1,3 @@
-<img src="https://github.com/user-attachments/assets/14c03b62-66c6-43de-ad04-2921b961c12e" width=500 align="middle">
-<h1 align="middle">AWS for Developers</h1>
+<center></center>
+<img src="https://github.com/user-attachments/assets/4ccd8f9d-68f5-43d3-842c-c3a56b1d6339" width=500>
+
