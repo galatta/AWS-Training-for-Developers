@@ -1,1 +1,97 @@
+Install an Apache web server with PHP
+Next, you connect to your EC2 instance and install the web server.
+To connect to your EC2 instance and install the Apache web server with PHP
+1. Connect to the EC2 instance that you created earlier by following the steps in Connect to
+your Linux instance(see additional tutorial to use PuTTY).
+2. Get the latest bug fixes and security updates by updating the software on your EC2
+instance. To do this, use the following command.
+Note
+The -y option installs the updates without asking for confirmation. To examine updates
+before installing, omit this option.
+sudo yum update -y
+3. After the updates complete, install the PHP software using the amazon-linux-extras
+install command. This command installs multiple software packages and related
+dependencies at the same time.
+sudo amazon-linux-extras install -y lamp-mariadb10.2-php7.2 php7.2
+If you receive an error stating sudo: amazon-linux-extras: command not found, then your
+instance was not launched with an Amazon Linux 2 AMI (perhaps you are using the
+Amazon Linux AMI instead). You can view your version of Amazon Linux using the
+following command.
+cat /etc/system-release
+4. Install the Apache web server.
+sudo yum install -y httpd
+5. Start the web server with the command shown following.
+sudo systemctl start httpd
+You can test that your web server is properly installed and started. To do this, enter the
+public Domain Name System (DNS) name of your EC2 instance in the address bar of a web
+browser, for example: http://ec2-42-8-168-21.us-west-1.compute.amazonaws.com. If your
+web server is running, then you see the Apache test page.
+If you don't see the Apache test page, check your inbound rules for the VPC security group
+that you created when you created your VPC. Make sure that your inbound rules include a
+rule allowing HTTP (port 80) or All access for the IP address you use to connect to the web
+server.
+Note
+The Apache test page appears only when there is no content in the document root
+directory, /var/www/html. After you add content to the document root directory, your
+content appears at the public DNS address of your EC2 instance instead of the Apache test
+page.
+6. Configure the web server to start with each system boot using the systemctl command.
+sudo systemctl enable httpd
+To allow ec2-user to manage files in the default root directory for your Apache web
+server, modify the ownership and permissions of the /var/www directory. There are many
+ways to accomplish this task. In this tutorial, you add ec2-user to the apache group, to
+give the apache group ownership of the /var/www directory and assign write permissions
+to the group.
+To set file permissions for the Apache web server
+1. Add the ec2-user user to the apache group.
+sudo usermod -a -G apache ec2-user
+2. Log out to refresh your permissions and include the new apache group.
+exit
+3. Log back in again and verify that the apache group exists with the groups command.
+groups
+Your output looks similar to the following:
+ec2-user adm wheel apache systemd-journal
+4. Change the group ownership of the /var/www directory and its contents to the apache group.
+sudo chown -R ec2-user:apache /var/www
+5. Change the directory permissions of /var/www and its subdirectories to add group write
+permissions and set the group ID on subdirectories created in the future.
+6. sudo chmod 2775 /var/www
+find /var/www -type d -exec sudo chmod 2775 {} \;
+7. Recursively change the permissions for files in the /var/www directory and its subdirectories
+to add group write permissions.
+find /var/www -type f -exec sudo chmod 0664 {} \;
+Now, ec2-user (and any future members of the apache group) can add, delete, and edit
+files in the Apache document root, enabling you to add content, such as a static website
+or a PHP application.
+Note
+A web server running the HTTP protocol provides no transport security for the data that it
+sends or receives. When you connect to an HTTP server using a web browser, the URLs that
+you visit, the content of web pages that you receive, and the contents (including
+passwords) of any HTML forms that you submit are all visible to eavesdroppers anywhere
+along the network pathway. The best practice for securing your web server is to install
+support for HTTPS (HTTP Secure), which protects your data with SSL/TLS encryption.
+Create your first Website in your Apache web server
+Next, you add content to your Apache web server that connects to your Amazon RDS
+DB instance.
+To add content to the Apache web server that connects to your DB instance
+1. While still connected to your EC2 instance, change the directory to /var/www and create a
+new subdirectory named inc.
+cd /var/www/html
+2. Create a new file in the htmnl directory named Gustavo.html, and then edit the file by calling
+nano (or the editor of your choice).
+nano gustavo.html
+3. Add the following contents to gustavo.html.
+.
+<html>
+<head>
+ <title>Gustavo Website</title>
+</head>
+<body>
+ <h1>Welcome to Gustavo’s Website</h1>
+</body>
+</html>
 
+4. Save and close the gustavo.html file.
+5. Verify that your web server successfully works by opening a web browser and browsing
+to http://EC2 instance endpoint/gustavo.html, for example: http://ec2-55-122-41-31.uswest-2.compute.amazonaws.com/SamplePage.php.
+6. Congratulations!!! You just created your first website in your new Webserver.
